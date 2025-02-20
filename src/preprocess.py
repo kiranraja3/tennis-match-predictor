@@ -2,10 +2,10 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-with open("C:\\Users\\kiran\\Downloads\\WryEvenModulus\\WryEvenModulus\\charting-m-matches.csv", 'r', encoding='ISO-8859-1', errors='ignore') as f:
+with open("/path/to/charting-m-matches.csv", 'r', encoding='ISO-8859-1', errors='ignore') as f:
   matches = pd.read_csv(f, engine='python', on_bad_lines='skip')
 
-with open("C:\\Users\\kiran\\Downloads\\WryEvenModulus\\WryEvenModulus\\charting-m-points.csv", 'r', encoding='ISO-8859-1', errors='ignore') as f:
+with open("/path/to/charting-m-points.csv", 'r', encoding='ISO-8859-1', errors='ignore') as f:
   points = pd.read_csv(f, engine='python', on_bad_lines='skip')
 
 
@@ -29,7 +29,7 @@ def preprocess_data(df, scaler=None, training=True):
 
     # Extract targets:
     # GmW: expected to be 0, 1, or 2 (leave as-is)
-    # PtWinner: remap 1 -> 0 and 2 -> 1 so that it is 0-indexed.
+    # PtWinner: remap 1 -> 0 and 2 -> 1 so that it is 0-indexed
     if "GmW" in df.columns and "PtWinner" and "SetW" in df.columns:
         y_gmw = pd.to_numeric(df["GmW"], errors='coerce').fillna(0).astype(int)
         y_pt = pd.to_numeric(df["PtWinner"], errors='coerce').fillna(1).astype(int) - 1
@@ -37,13 +37,13 @@ def preprocess_data(df, scaler=None, training=True):
     else:
         raise ValueError("Both target columns ('GmW' and 'PtWinner') must be present in the data.")
 
-    # Prepare features DataFrame by dropping non-feature columns.
+    # Prepare features DataFrame by dropping non-feature columns
     X = df.drop(columns=drop_columns, errors='ignore')
 
-    # Convert all remaining columns to numeric. Non-convertible values become NaN, then fill with 0.
+    # Convert all remaining columns to numeric. Non-convertible values become NaN, then fill with 0
     X = X.apply(pd.to_numeric, errors='coerce').fillna(0)
 
-    # Scale features: if training, fit the scaler; otherwise, use the provided scaler.
+    # Scale features: if training, fit the scaler; otherwise, use the provided scaler
     if training:
         scaler = StandardScaler()
         X_scaled = scaler.fit_transform(X)
@@ -60,7 +60,7 @@ def get_train_test_data(csv_file="combined.csv", test_size=0.3, random_state=42)
     X, y, scaler = preprocess_data(df, training=True)
     y_gmw, y_pt, y_setw = y
 
-    # Split features and targets (using the same random state for consistency)
+    # Split features and targets
     X_train, X_test, y_gmw_train, y_gmw_test = train_test_split(
         X, y_gmw, test_size=test_size, random_state=random_state
     )
